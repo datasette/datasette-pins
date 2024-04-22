@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+
+{% block title %}Comments{% endblock %}
+
+{% block extra_head %}
+<script src="{{ urls.static_plugins("datasette_pins", "reorder_view/index.min.js") }}"></script>
+<link href="{{ urls.static_plugins("datasette_pins", "reorder_view/index.min.css") }}" rel="stylesheet" />
+<style>
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="root"></div>
+{% endblock %}

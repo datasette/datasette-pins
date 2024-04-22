@@ -1,0 +1,36 @@
+[project]
+name = "datasette-pins"
+version = "0.1"
+description = "Pin databases, tables, and other items to the Datasette homepage"
+readme = "README.md"
+authors = [{name = "Alex Garcia"}]
+license = {text = "Apache-2.0"}
+classifiers=[
+    "Framework :: Datasette",
+    "License :: OSI Approved :: Apache Software License"
+]
+requires-python = ">=3.8"
+dependencies = ["datasette>=1.0a6", "sqlite-migrate==0.1b0"]
+
+
+[project.urls]
+Homepage = "https://github.com/datasette/datasette-pins"
+Changelog = "https://github.com/datasette/datasette-pins/releases"
+Issues = "https://github.com/datasette/datasette-pins/issues"
+CI = "https://github.com/datasette/datasette-pins/actions"
+
+[project.entry-points.datasette]
+pins = "datasette_pins"
+
+[project.optional-dependencies]
+test = ["pytest", "pytest-asyncio", "ruff"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"
+
+[tool.setuptools.package-data]
+datasette_pins = ["static/*", "templates/*"]
+
+[tool.setuptools.packages.find]
+include = ["datasette_pins*"]
+exclude = ["docs*", "tests*", "node_modules"]

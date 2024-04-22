@@ -1,0 +1,32 @@
+:root {
+  --datasette-blue: #276890;
+}
+.datasette-pins-container {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  grid-gap: 8px;
+}
+
+.datasette-pins-item {
+  display: flex;
+
+  padding: 1rem;
+  height: 60px;
+  background: #ffffff;
+  box-shadow: -2px 4px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  justify-content: space-between;
+
+  & a {
+    line-height: 16px;
+    font-weight: 600;
+    color: black;
+    text-decoration: none;
+  }
+
+  & .desc {
+    font-style: italic;
+    font-size: 0.8rem;
+  }
+}
