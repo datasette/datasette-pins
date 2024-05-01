@@ -3,21 +3,41 @@
 }
 .datasette-pins-container {
   display: grid;
-  grid-template-columns: auto auto auto;
+  --min-column-width: min(360px, 100%);
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(var(--min-column-width), 1fr)
+  );
   grid-gap: 8px;
 }
 
 .datasette-pins-item {
-  display: flex;
-
   padding: 1rem;
-  height: 60px;
+  height: 68px;
   background: #ffffff;
   box-shadow: -2px 4px 4px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   cursor: pointer;
-  justify-content: space-between;
 
+  & .main {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  & .title-bar {
+    display: flex;
+    align-items: center;
+    text-overflow: ellipsis;
+    column-gap: 8px;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  & .title-label {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
   & a {
     line-height: 16px;
     font-weight: 600;
@@ -28,5 +48,17 @@
   & .desc {
     font-style: italic;
     font-size: 0.8rem;
+    padding-left: 1.5rem;
   }
+
+  & button.pin-button {
+    cursor: pointer;
+    border: none;
+    background: none;
+  }
+}
+
+.reorder {
+  text-align: right;
+  font-size: 0.8rem;
 }

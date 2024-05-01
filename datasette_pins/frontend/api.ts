@@ -10,10 +10,11 @@ async function api(path: string, params?: { method?: string; data?: any }) {
 }
 
 export interface GlobalPin {
+  metadata?: { summary?: string };
   id: number;
   pinned_actor_id: string;
   pin_location: "home";
-  item_type: "database" | "table";
+  item_type: "database" | "table" | "canned_query";
   origin_database: string;
   origin_table: string;
   order_idx: number;
@@ -30,5 +31,11 @@ export class Api {
   }
   static async global_pins(): Promise<{ data: GlobalPin[] }> {
     return api("/-/datasette-pins/api/global_pins");
+  }
+  static async unpin(item_id: number) {
+    return api("/-/datasette-pins/api/unpin", {
+      method: "POST",
+      data: { item_id },
+    });
   }
 }

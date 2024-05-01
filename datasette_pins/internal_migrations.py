@@ -5,7 +5,6 @@ from pathlib import Path
 internal_migrations = Migrations("datasette-pins.internal")
 
 
-
 @internal_migrations()
 def m001_initial(db: Database):
     db.executescript(

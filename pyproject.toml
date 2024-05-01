@@ -1,6 +1,6 @@
 [project]
 name = "datasette-pins"
-version = "0.1"
+version = "0.1a1"
 description = "Pin databases, tables, and other items to the Datasette homepage"
 readme = "README.md"
 authors = [{name = "Alex Garcia"}]
@@ -29,7 +29,7 @@ test = ["pytest", "pytest-asyncio", "ruff"]
 asyncio_mode = "strict"
 
 [tool.setuptools.package-data]
-datasette_pins = ["static/*", "templates/*"]
+datasette_pins = ["static/**", "templates/*"]
 
 [tool.setuptools.packages.find]
 include = ["datasette_pins*"]

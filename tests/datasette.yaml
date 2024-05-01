@@ -1,0 +1,15 @@
+databases:
+  legislators:
+    source: Alternative source
+    source_url: http://example.com/
+    tables:
+      offices:
+        summary: office address or sumtin
+      legislators:
+        summary: politicans
+      executive_terms:
+        summary: presidents and stuff
+    queries:
+      abcdefghijabcdefghijabcdefghij:
+        title: "aaaahhh"
+        sql: select 1 + 2
