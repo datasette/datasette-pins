@@ -5,31 +5,46 @@
 [![Tests](https://github.com/datasette/datasette-pins/actions/workflows/test.yml/badge.svg)](https://github.com/datasette/datasette-pins/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/datasette/datasette-pins/blob/main/LICENSE)
 
-Pin databases, tables, and other items to the Datasette homepage
+Pin databases, tables, and other items to the Datasette homepage. Work in
+progress!
 
 ## Installation
 
-Install this plugin in the same environment as Datasette.
+`datasette-pins` requires a recent 1.0 alpha version of Datasette to work.
+
 ```bash
-datasette install datasette-pins
+pip install datasette==1.0a13
 ```
+
+Afterwards, install this plugin in the same environment as Datasette.
+
+```bash
+datasette install datasette-comments
+```
+
 ## Usage
 
 Usage instructions go here.
 
 ## Development
 
-To set up this plugin locally, first checkout the code. Then create a new virtual environment:
+To set up this plugin locally, first checkout the code. Then create a new
+virtual environment:
+
 ```bash
 cd datasette-pins
 python3 -m venv venv
 source venv/bin/activate
 ```
+
 Now install the dependencies and test dependencies:
+
 ```bash
 pip install -e '.[test]'
 ```
+
 To run the tests:
+
 ```bash
 pytest
 ```
