@@ -19,7 +19,7 @@ pip install datasette==1.0a13
 Afterwards, install this plugin in the same environment as Datasette.
 
 ```bash
-datasette install datasette-comments
+datasette install datasette-pins
 ```
 
 ## Usage
