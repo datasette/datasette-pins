@@ -14,7 +14,7 @@ Pin databases, tables, queries, and more to the Datasette homepage!
 `datasette-pins` requires a recent 1.0 alpha version of Datasette to work.
 
 ```bash
-pip install datasette==1.0a13
+pip install datasette>=1.0a13
 ```
 
 Afterwards, install this plugin in the same environment as Datasette.
