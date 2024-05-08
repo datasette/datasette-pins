@@ -2,10 +2,16 @@ databases:
   legislators:
     source: Alternative source
     source_url: http://example.com/
+    summary: "All historical and current congressional legislators"
     tables:
       offices:
         summary: office address or sumtin
       legislators:
         summary: politicans
       executive_terms:
-        summary: presidents and stuff
+        summary: Presidential terms
+      social_media:
+        summary: Social media accounts for current legislators
+    queries:
+      millenntial_represetatives:
+      datasette-cloud-assets  summary: Social media accounts for current legislators

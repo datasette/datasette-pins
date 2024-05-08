@@ -2,14 +2,19 @@ databases:
   legislators:
     source: Alternative source
     source_url: http://example.com/
-    tables:
-      offices:
-        summary: office address or sumtin
-      legislators:
-        summary: politicans
-      executive_terms:
-        summary: presidents and stuff
     queries:
-      abcdefghijabcdefghijabcdefghij:
+      millennial_representatives:
         title: "aaaahhh"
         sql: select 1 + 2
+      ww2_terms:
+        title: "aaaahhh"
+        sql: select 1 + 2
+      great_depression:
+        title: "aaaahhh"
+        sql: select 1 + 2
+permissions:
+  datasette-pins-read:
+    id: "*"
+    unauthenticated: true
+  datasette-pins-write:
+    id: "root"

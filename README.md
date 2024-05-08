@@ -5,8 +5,9 @@
 [![Tests](https://github.com/datasette/datasette-pins/actions/workflows/test.yml/badge.svg)](https://github.com/datasette/datasette-pins/actions/workflows/test.yml)
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/datasette/datasette-pins/blob/main/LICENSE)
 
-Pin databases, tables, and other items to the Datasette homepage. Work in
-progress!
+Pin databases, tables, queries, and more to the Datasette homepage!
+
+<img src="https://datasette-cloud-assets.s3.amazonaws.com/blog/2024/datasette-pins/hero.png"/>
 
 ## Installation
 
@@ -24,7 +25,28 @@ datasette install datasette-pins
 
 ## Usage
 
-Usage instructions go here.
+`datasette-pins` has two permissions `datasette-pins-write` and
+`datasette-pins-read`. Actors with the `datasette-pins-write` permissions can
+pin and reorder items, while actors with `datasette-pins-read` permissions can
+only view pinned items.
+
+Here's an example
+[`datasette.yaml` file](https://docs.datasette.io/en/latest/configuration.html#datasette-yaml-reference)
+where all actors can view pins, but only the `root` actor can pin items:
+
+```yaml
+permissions:
+  datasette-pins-read:
+    id: "*"
+    unauthenticated: true
+  datasette-pins-write:
+    id: "root"
+```
+
+Once logged in, the `root` use will see new pin/unpin option under the database,
+table, and query actions menu:
+
+<img src="https://datasette-cloud-assets.s3.amazonaws.com/blog/2024/datasette-pins/table-example.png"/>
 
 ## Development
 
