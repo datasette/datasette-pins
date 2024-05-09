@@ -16,15 +16,19 @@ Pin databases, tables, queries, and more to the Datasette homepage!
 ```bash
 pip install datasette>=1.0a13
 ```
-
 Afterwards, install this plugin in the same environment as Datasette.
 
 ```bash
 datasette install datasette-pins
 ```
 
-## Usage
+## Configuration
 
+`datasette-pins` stores pins in the [internal database](https://docs.datasette.io/en/latest/internals.html#datasette-s-internal-database). This database runs in-memory by default, which means your pins will be lost if you restart the server. To avoid that, start Datasette with the `--internal` option to specify where that database should be stored on disk:
+
+```bash
+datasette mydatabase.db --internal internal.db
+```
 `datasette-pins` has two permissions `datasette-pins-write` and
 `datasette-pins-read`. Actors with the `datasette-pins-write` permissions can
 pin and reorder items, while actors with `datasette-pins-read` permissions can
@@ -42,6 +46,8 @@ permissions:
   datasette-pins-write:
     id: "root"
 ```
+
+## Usage
 
 Once logged in, the `root` use will see new pin/unpin option under the database,
 table, and query actions menu:
