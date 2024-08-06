@@ -34,6 +34,16 @@ function pinUi(pin: GlobalPin, onUnpin) {
   </div>`;
 }
 
+function updateReorderVisibility() {
+  const reorder = document.querySelector("#datasette-pins-homepage-target .reorder")!;
+  const items = document.querySelectorAll(".datasette-pins-item");
+  if (items.length > 1) {
+    reorder.style.display = "block";
+  } else {
+    reorder.style.display = "none";
+  }
+}
+
 async function main() {
   const TARGET = document.querySelector("#datasette-pins-homepage-target")!;
   const pins: GlobalPin[] = JSON.parse(
@@ -49,9 +59,17 @@ async function main() {
       ) {
         Api.unpin(pin.id).then(() => {
           (e.target as HTMLElement).closest(".datasette-pins-item")?.remove();
+          // Hide the whole container if there are no more pins
+          if (!TARGET.querySelector(".datasette-pins-item")) {
+            TARGET.innerHTML = '';
+          }
+          updateReorderVisibility();
         });
       }
     };
+  }
+  if (!pins.length) {
+    return;
   }
   TARGET.appendChild(html`
     <div>
@@ -64,5 +82,6 @@ async function main() {
       </div>
     </div>
   `);
+  updateReorderVisibility();
 }
 document.addEventListener("DOMContentLoaded", main);
