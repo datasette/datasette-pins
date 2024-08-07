@@ -10,7 +10,7 @@ classifiers=[
     "License :: OSI Approved :: Apache Software License"
 ]
 requires-python = ">=3.8"
-dependencies = ["datasette>=1.0a6", "sqlite-migrate==0.1b0"]
+dependencies = ["datasette==1.0a14", "sqlite-migrate==0.1b0"]
 
 
 [project.urls]

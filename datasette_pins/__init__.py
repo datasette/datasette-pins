@@ -346,10 +346,8 @@ def top_homepage(datasette, request):
         )
         data = [dict(row) for row in rows]
         for i, row in enumerate(rows):
-            metadata = datasette.metadata(
-                database=row["origin_database"],
-                table=row["origin_table"],
-                fallback=False,
+            metadata = await datasette.get_resource_metadata(
+                row["origin_database"], row["origin_table"]
             )
             data[i]["metadata"] = metadata
 
