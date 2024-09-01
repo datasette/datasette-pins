@@ -1,6 +1,6 @@
 [project]
 name = "datasette-pins"
-version = "0.1a3"
+version = "0.1a4"
 description = "Pin databases, tables, and other items to the Datasette homepage"
 readme = "README.md"
 authors = [{name = "Alex Garcia"}]
