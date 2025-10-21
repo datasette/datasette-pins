@@ -1,6 +1,6 @@
 [project]
 name = "datasette-pins"
-version = "0.1a4"
+version = "0.1a5"
 description = "Pin databases, tables, and other items to the Datasette homepage"
 readme = "README.md"
 authors = [{name = "Alex Garcia"}]
@@ -10,7 +10,7 @@ classifiers=[
     "License :: OSI Approved :: Apache Software License"
 ]
 requires-python = ">=3.8"
-dependencies = ["datasette>=1.0a14", "sqlite-migrate>=0.1b0"]
+dependencies = ["datasette==1.0a19", "sqlite-migrate>=0.1b0"]
 
 
 [project.urls]
