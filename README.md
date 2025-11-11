@@ -76,3 +76,21 @@ To run the tests:
 ```bash
 pytest
 ```
+
+### Building JavaScript from TypeScript
+
+This plugin includes TypeScript/TSX source files in `datasette_pins/frontend/` that need to be compiled to JavaScript. If you modify any `.ts` or `.tsx` files, you'll need to rebuild the JavaScript.
+
+First install the Node.js dependencies:
+
+```bash
+npm install
+```
+
+Then build the JavaScript using [just](https://github.com/casey/just):
+
+```bash
+just js
+```
+
+This uses esbuild to compile and minify the TypeScript files into `datasette_pins/static/`.
