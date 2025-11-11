@@ -23,6 +23,9 @@ async def ds_with_data(tmp_path_factory):
         ]
     )
 
+    # Create a SQL view
+    db.execute("CREATE VIEW items_view AS SELECT * FROM items WHERE id > 0")
+
     # Create a Datasette instance with a canned query
     datasette = Datasette(
         [db_path],
@@ -71,6 +74,7 @@ async def test_permissions():
     "item_type,path",
     [
         ("table", "/test/items"),
+        ("view", "/test/items_view"),
         ("database", "/test"),
         ("query", "/test/test_query"),
     ],
@@ -100,6 +104,15 @@ async def test_action_buttons_visibility_by_actor(ds_with_data, item_type, path)
             "table",
             "/test/items",
             {"item_type": "table", "origin_database": "test", "origin_table": "items"},
+        ),
+        (
+            "view",
+            "/test/items_view",
+            {
+                "item_type": "view",
+                "origin_database": "test",
+                "origin_table": "items_view",
+            },
         ),
         ("database", "/test", {"item_type": "database", "origin_database": "test"}),
         (
@@ -146,6 +159,7 @@ async def test_unpin_button_appears_after_pinning(
     "item_type,origin_database,origin_table",
     [
         ("table", "test", "items"),
+        ("view", "test", "items_view"),
         ("database", "test", None),
         ("canned_query", "test", "test_query"),
     ],

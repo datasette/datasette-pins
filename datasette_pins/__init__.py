@@ -151,46 +151,77 @@ class Routes:
         return Response.json({"ok": True})
 
 
-@hookimpl
-async def table_actions(datasette, actor, database, table):
+async def _pin_unpin_action(datasette, actor, database, item_type, item_name=None):
+    """
+    Shared helper for creating pin/unpin actions for tables, views, databases, and queries.
+
+    Args:
+        datasette: The Datasette instance
+        actor: The current actor
+        database: The database name
+        item_type: One of "table", "view", "database", "canned_query"
+        item_name: The name of the item (table/view/query name), None for databases
+    """
     if not (
         await datasette.allowed(action=READ_PERMISSIONS, actor=actor)
         or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor)
     ):
         return
-    pin_id = await datasette.get_internal_database().execute(
+
+    # Build the query and parameters based on whether item_name is provided
+    if item_name is None:
+        # For databases
+        query = """
+            select id
+            from datasette_pins_global_pinned_items
+            where item_type == ?
+              and origin_database = ?
+            limit 1
         """
-        select id
-        from datasette_pins_global_pinned_items
-        where item_type == "table"
-          and origin_database = ?
-          and origin_table = ?
-        limit 1
-        """,
-        [database, table],
-    )
+        params = [item_type, database]
+    else:
+        # For tables, views, and queries
+        query = """
+            select id
+            from datasette_pins_global_pinned_items
+            where item_type == ?
+              and origin_database = ?
+              and origin_table = ?
+            limit 1
+        """
+        params = [item_type, database, item_name]
+
+    pin_id = await datasette.get_internal_database().execute(query, params)
+
+    # Determine the display name for descriptions
+    display_name = "query" if item_type == "canned_query" else item_type
 
     if len(pin_id) == 0:
+        # Build the pin request body
+        body = {
+            "item_type": item_type,
+            "origin_database": database,
+        }
+        if item_name is not None:
+            body["origin_table"] = item_name
+
         js = f"""
         fetch("/-/datasette-pins/api/pin", {{
           method: "POST",
           headers: {{
             "Content-Type": "application/json",
           }},
-          body: JSON.stringify({{
-            item_type: {json.dumps("table")},
-            origin_database: {json.dumps(database)},
-            origin_table: {json.dumps(table)},
-          }})
+          body: JSON.stringify({json.dumps(body)})
         }}).then( () => window.location.reload())
       """
         return [
             {
                 "href": f"javascript:{(js)}",
                 "label": "Pin",
-                "description": "Pin this table to the homepage",
+                "description": f"Pin this {display_name} to the homepage",
             }
         ]
+
     js = f"""
       fetch("/-/datasette-pins/api/unpin", {{
         method: "POST",
@@ -206,128 +237,31 @@ async def table_actions(datasette, actor, database, table):
         {
             "href": f"javascript:{(js)}",
             "label": "Unpin",
-            "description": "Remove this table from the homepage pinned section",
+            "description": f"Remove this {display_name} from the homepage pinned section",
         }
     ]
+
+
+@hookimpl
+async def table_actions(datasette, actor, database, table):
+    return await _pin_unpin_action(datasette, actor, database, "table", table)
+
+
+@hookimpl
+async def view_actions(datasette, actor, database, view):
+    return await _pin_unpin_action(datasette, actor, database, "view", view)
 
 
 @hookimpl
 async def database_actions(datasette, actor, database):
-    if not (
-        await datasette.allowed(action=READ_PERMISSIONS, actor=actor)
-        or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor)
-    ):
-        return
-    pin_id = await datasette.get_internal_database().execute(
-        """
-        select id
-        from datasette_pins_global_pinned_items
-        where item_type == "database"
-          and origin_database = ?
-        limit 1
-        """,
-        [database],
-    )
-
-    if len(pin_id) == 0:
-        js = f"""
-        fetch("/-/datasette-pins/api/pin", {{
-          method: "POST",
-          headers: {{
-            "Content-Type": "application/json",
-          }},
-          body: JSON.stringify({{
-            item_type: {json.dumps("database")},
-            origin_database: {json.dumps(database)},
-          }})
-        }}).then( () => window.location.reload())
-      """
-        return [
-            {
-                "href": f"javascript:{(js)}",
-                "label": "Pin",
-                "description": "Pin this database to the homepage",
-            }
-        ]
-    js = f"""
-      fetch("/-/datasette-pins/api/unpin", {{
-        method: "POST",
-        headers: {{
-          "Content-Type": "application/json",
-        }},
-        body: JSON.stringify({{
-          item_id: {json.dumps(pin_id.single_value())},
-        }})
-      }}).then( () => window.location.reload())
-    """
-    return [
-        {
-            "href": f"javascript:{(js)}",
-            "label": "Unpin",
-            "description": "Remove this database from the homepage pinned section",
-        }
-    ]
+    return await _pin_unpin_action(datasette, actor, database, "database")
 
 
 @hookimpl
 async def query_actions(datasette, actor, database, query_name):
-    if not (
-        await datasette.allowed(action=READ_PERMISSIONS, actor=actor)
-        or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor)
-    ):
-        return
-
-    pin_id = await datasette.get_internal_database().execute(
-        """
-        select id
-        from datasette_pins_global_pinned_items
-        where item_type == "canned_query"
-          and origin_database = ?
-          and origin_table = ?
-        limit 1
-        """,
-        [database, query_name],
+    return await _pin_unpin_action(
+        datasette, actor, database, "canned_query", query_name
     )
-
-    if len(pin_id) == 0:
-        js = f"""
-        fetch("/-/datasette-pins/api/pin", {{
-          method: "POST",
-          headers: {{
-            "Content-Type": "application/json",
-          }},
-          body: JSON.stringify({{
-            item_type: {json.dumps("canned_query")},
-            origin_database: {json.dumps(database)},
-            origin_table: {json.dumps(query_name)},
-          }})
-        }}).then( () => window.location.reload())
-      """
-        return [
-            {
-                "href": f"javascript:{(js)}",
-                "label": "Pin",
-                "description": "Pin this table to the homepage",
-            }
-        ]
-    js = f"""
-      fetch("/-/datasette-pins/api/unpin", {{
-        method: "POST",
-        headers: {{
-          "Content-Type": "application/json",
-        }},
-        body: JSON.stringify({{
-          item_id: {json.dumps(pin_id.single_value())},
-        }})
-      }}).then( () => window.location.reload())
-    """
-    return [
-        {
-            "href": f"javascript:{(js)}",
-            "label": "Unpin",
-            "description": "Remove this table from the homepage pinned section",
-        }
-    ]
 
 
 @hookimpl
