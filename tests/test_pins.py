@@ -98,6 +98,47 @@ async def test_action_buttons_visibility_by_actor(ds_with_data, item_type, path)
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize(
+    "item_type,path",
+    [
+        ("table", "/test/items"),
+        ("view", "/test/items_view"),
+        ("database", "/test"),
+        ("query", "/test/test_query"),
+    ],
+)
+async def test_action_buttons_hidden_for_read_only_user(item_type, path, tmp_path_factory):
+    """Test that Pin/Unpin action buttons are NOT visible to users who only have read permission."""
+    db_directory = tmp_path_factory.mktemp("dbs")
+    db_path = db_directory / "test.db"
+    db = sqlite_utils.Database(db_path)
+    db["items"].insert_all(
+        [{"id": 1, "name": "Item 1"}, {"id": 2, "name": "Item 2"}]
+    )
+    db.execute("CREATE VIEW items_view AS SELECT * FROM items WHERE id > 0")
+
+    datasette = Datasette(
+        [db_path],
+        config={
+            "databases": {
+                "test": {"queries": {"test_query": {"sql": "select * from items"}}}
+            },
+            "permissions": {
+                "datasette-pins-read": {"id": "*"},
+            },
+        },
+    )
+    await datasette.invoke_startup()
+
+    # A read-only user should NOT see Pin/Unpin action buttons
+    reader_cookies = {"ds_actor": datasette.client.actor_cookie({"id": "reader"})}
+    response = await datasette.client.get(path, cookies=reader_cookies)
+    assert response.status_code == 200
+    assert "/-/datasette-pins/api/pin" not in response.text
+    assert "/-/datasette-pins/api/unpin" not in response.text
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
     "item_type,path,post_data",
     [
         (

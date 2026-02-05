@@ -162,10 +162,7 @@ async def _pin_unpin_action(datasette, actor, database, item_type, item_name=Non
         item_type: One of "table", "view", "database", "canned_query"
         item_name: The name of the item (table/view/query name), None for databases
     """
-    if not (
-        await datasette.allowed(action=READ_PERMISSIONS, actor=actor)
-        or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor)
-    ):
+    if not await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor):
         return
 
     # Build the query and parameters based on whether item_name is provided
