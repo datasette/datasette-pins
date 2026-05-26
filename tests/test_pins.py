@@ -33,3 +33,20 @@ async def test_permissions():
         cookies=cookie_for_actor(datasette, "unknown"),
     )
     assert response.status_code == 403
+
+
+@pytest.mark.asyncio
+async def test_sidebar_app_registered():
+    # datasette-sidebar is an optional integration; only test when installed.
+    pytest.importorskip("datasette_sidebar")
+    from datasette.plugins import pm
+
+    datasette = Datasette(memory=True)
+    results = pm.hook.datasette_sidebar_apps(datasette=datasette)
+    apps = [app for result in results if result for app in result]
+    pins = [app for app in apps if app.label == "Pins"]
+    assert len(pins) == 1
+    pin = pins[0]
+    assert pin.resolve_href() == "/-/datasette-pins/"
+    assert "bi-pin-map-fill" in pin.icon
+    assert pin.description
