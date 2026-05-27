@@ -3,7 +3,8 @@ from .internal_migrations import internal_migrations
 from sqlite_utils import Database
 import json
 from functools import wraps
-from datasette import hookimpl, Response, Permission, Forbidden
+from datasette import hookimpl, Response, Forbidden
+from datasette.permissions import Action
 
 READ_PERMISSIONS = "datasette-pins-read"
 WRITE_PERMISSIONS = "datasette-pins-write"
@@ -14,12 +15,12 @@ def check_permission(write=False):
         @wraps(func)
         async def wrapper(scope, receive, datasette, request):
             if write:
-                result = await datasette.permission_allowed(
-                    request.actor, WRITE_PERMISSIONS, default=False
+                result = await datasette.allowed(
+                    action=WRITE_PERMISSIONS, actor=request.actor
                 )
             else:
-                result = await datasette.permission_allowed(
-                    request.actor, READ_PERMISSIONS, default=False
+                result = await datasette.allowed(
+                    action=READ_PERMISSIONS, actor=request.actor
                 )
             if not result:
                 raise Forbidden("Permission denied for datasette-pins")
@@ -152,8 +153,8 @@ class Routes:
 @hookimpl
 async def table_actions(datasette, actor, database, table):
     if not (
-        await datasette.permission_allowed(actor, READ_PERMISSIONS, default=False)
-        or await datasette.permission_allowed(actor, WRITE_PERMISSIONS, default=False)
+        await datasette.allowed(action=READ_PERMISSIONS, actor=actor)
+        or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor)
     ):
         return
     pin_id = await datasette.get_internal_database().execute(
@@ -212,8 +213,8 @@ async def table_actions(datasette, actor, database, table):
 @hookimpl
 async def database_actions(datasette, actor, database):
     if not (
-        await datasette.permission_allowed(actor, READ_PERMISSIONS, default=False)
-        or await datasette.permission_allowed(actor, WRITE_PERMISSIONS, default=False)
+        await datasette.allowed(action=READ_PERMISSIONS, actor=actor)
+        or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor)
     ):
         return
     pin_id = await datasette.get_internal_database().execute(
@@ -269,9 +270,9 @@ async def database_actions(datasette, actor, database):
 
 @hookimpl
 async def query_actions(datasette, actor, database, query_name):
-    if await datasette.permission_allowed(
-        actor, READ_PERMISSIONS, default=False
-    ) or await datasette.permission_allowed(actor, WRITE_PERMISSIONS, default=False):
+    if await datasette.allowed(
+        action=READ_PERMISSIONS, actor=actor
+    ) or await datasette.allowed(action=WRITE_PERMISSIONS, actor=actor):
         pin_id = await datasette.get_internal_database().execute(
             """
             select id
@@ -329,12 +330,8 @@ async def query_actions(datasette, actor, database, query_name):
 def top_homepage(datasette, request):
     async def f():
         if not (
-            await datasette.permission_allowed(
-                request.actor, READ_PERMISSIONS, default=False
-            )
-            or await datasette.permission_allowed(
-                request.actor, WRITE_PERMISSIONS, default=False
-            )
+            await datasette.allowed(action=READ_PERMISSIONS, actor=request.actor)
+            or await datasette.allowed(action=WRITE_PERMISSIONS, actor=request.actor)
         ):
             return ""
         rows = await datasette.get_internal_database().execute(
@@ -361,12 +358,8 @@ def top_homepage(datasette, request):
 def extra_css_urls(template, database, table, columns, view_name, request, datasette):
     async def inner():
         if view_name == "index" and (
-            await datasette.permission_allowed(
-                request.actor, READ_PERMISSIONS, default=False
-            )
-            or await datasette.permission_allowed(
-                request.actor, WRITE_PERMISSIONS, default=False
-            )
+            await datasette.allowed(action=READ_PERMISSIONS, actor=request.actor)
+            or await datasette.allowed(action=WRITE_PERMISSIONS, actor=request.actor)
         ):
             return [
                 datasette.urls.path(
@@ -382,12 +375,8 @@ def extra_css_urls(template, database, table, columns, view_name, request, datas
 def extra_js_urls(template, database, table, columns, view_name, request, datasette):
     async def inner():
         if view_name == "index" and (
-            await datasette.permission_allowed(
-                request.actor, READ_PERMISSIONS, default=False
-            )
-            or await datasette.permission_allowed(
-                request.actor, WRITE_PERMISSIONS, default=False
-            )
+            await datasette.allowed(action=READ_PERMISSIONS, actor=request.actor)
+            or await datasette.allowed(action=WRITE_PERMISSIONS, actor=request.actor)
         ):
             return [
                 datasette.urls.path(
@@ -411,23 +400,17 @@ def register_routes():
 
 
 @hookimpl
-def register_permissions(datasette):
+def register_actions(datasette):
     return [
-        Permission(
+        Action(
             name=WRITE_PERMISSIONS,
             abbr=None,
             description="Can pin, unpin, and re-order pins for datasette-pins",
-            takes_database=False,
-            takes_resource=False,
-            default=False,
         ),
-        Permission(
+        Action(
             name=READ_PERMISSIONS,
             abbr=None,
             description="Can read pinned items.",
-            takes_database=False,
-            takes_resource=False,
-            default=False,
         ),
     ]
 
